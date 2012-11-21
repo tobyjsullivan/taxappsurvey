@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="stylesheets/base.css">
+	<link rel="stylesheet" href="stylesheets/skeleton.css">
+	<link rel="stylesheet" href="stylesheets/layout.css">
+	<script type='text/javascript' src='https://static.firebase.com/v0/firebase.js'></script>
+	<script type='text/javascript' src='jquery.js'></script>
+	<script type="text/javascript">
+	document.write('<scr' + 'ipt src="' + document.location.protocol + '//fby.s3.amazonaws.com/fby.js?100"></scr' + 'ipt>');
+	</script>
+	<script type="text/javascript">
+	FBY.showTab({id: '3394', position: 'right', color: '#3EAB12'});
+	</script>
+	<script type="text/javascript">
+	var taxsurvey = new Firebase("https://taxsurvey.firebaseio.com/");
+	var responses = taxsurvey.child('responses');
+	var signups = taxsurvey.child('signups');
+
+	var likes = 0;
+
+	$(document).ready(function() {
+		$('#notification-form').hide();
+		$('#signup-thankyou').hide();
+	});
+
+	responses.on('child_added', function(snapshot) {
+		var resp = snapshot.val();
+
+		if(resp.response == "yes") {
+			likes++;
+			updateLikeCounter();
+		}
+	});
+
+	function doLike() {
+		responses.push({response: "yes"});
+		switchToNotificationForm();
+	}
+
+	function doMaybe() {
+		responses.push({response: "maybe"});
+		switchToNotificationForm();
+	}
+
+	function doNoThanks() {
+		responses.push({response: "no"});
+		switchToNotificationForm();	
+	}
+
+	function switchToNotificationForm() {
+		$('#response-menu').hide();
+		$('#notification-form').show();
+	}
+
+	function finishSignup() {
+		$('#notification-form').hide();
+		$('#signup-thankyou').show();
+	}
+
+	function updateLikeCounter() {
+		$('#like-counter').html('Likes: ' + likes);
+	}
+
+	function doSignup() {
+		var name = $("#signup-name").val();
+		var email = $('#signup-email').val();
+
+		signups.push({name: name, email: email});
+
+		finishSignup();
+	}
+	</script>
+</head>
+<body>
+	<div class="container">
+		<div class="sixteen columns">
+			<p><em>From <a href="http://tobysullivan.net" target="_blank">Toby Sullivan</a></em></p>
+			<p>Let me tell you about an idea of mine...</p>
+			<h3>Taxes are a pain and sometimes scary for freelancers like you and I.</h3>
+			<p>I am going to build a website that tells you how much money to put away for taxes. You'll be able to know this the day you get paid. This way, you can avoid any nasty surprises at the end of the year.</p>
+			<p>As an expert in making lives easier, my product will have the following features:</p>
+			<ul class="square">
+				<li>It will be easy to understand so you don't have to learn anything about taxes.</li>
+				<li>It will err on the side of caution so that you can be sure to have enough put away even if you experience heavy swings in income during the year (as most freelancers do).</li>
+				<li>It will be quick to get the answers you need so you don't have to waste any time answering complicated questionairs (save that for your accountant).</li>
+			</ul>
+			
+			<p id="like-counter"></p>
+		</div>
+		<div id="response-menu">
+			<div class="sixteen columns">
+				<h2>What do you think of my idea?</h2>
+			</div>
+			<div class="one-third column">
+				<a href="#" class="button" onclick="javascript:doLike();">I WANT IT</a> 
+			</div>
+			<div class="one-third column">
+				<a href="#" class="button" onclick="javascript:doMaybe();">Maybe some day</a> 
+			</div>
+			<div class="one-third column">
+				<a href="#" class="button" onclick="javascript:doNoThanks();">No thanks</a> 
+			</div>
+		</div>
+		<div id="notification-form" class="sixteen columns hidden">
+			<p><strong>Thank you for your feedback!</strong> Use the link on the right side of the page if you'd like to say more.</p>
+
+			<p>Would you like to know when this website comes out? I promise I will never spam you.</p>
+			<label for="signup-name">Your Name</label>
+			<input type="text" id="signup-name" placeholder="First Name" />
+			<label for="signup-email">Email Address</label>
+			<input type="email" id="signup-email" placeholder="Email" />
+			<input type="button" id="signup-submit" value="Tell me when there's something to tell!" onclick="javascript:doSignup();" />
+		</div>
+		<div id="signup-thankyou">
+			<p><strong>Awesome! I'll be in touch soon.</strong></p>
+		</div>
+	</div>
+</body>
